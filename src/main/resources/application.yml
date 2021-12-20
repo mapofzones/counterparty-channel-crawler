@@ -1,0 +1,26 @@
+crawler:
+  sync-time: ${CR_SYNC_TIME}
+
+endpoint:
+  ibc:
+    denom-trace: '/ibc/applications/transfer/v1beta1/denom_traces/%s'
+    channels: '/ibc/core/channel/v1beta1/channels'
+
+spring:
+  main:
+    web-application-type: none
+
+  jpa:
+    open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+    hibernate:
+      ddl-auto: validate
+
+    properties:
+      hibernate:
+        schema_update:
+          unique_constraint_strategy: RECREATE_QUIETLY
+        jdbc:
+          lob:
+            non_contextual_creation: true
