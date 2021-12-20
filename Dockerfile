@@ -10,6 +10,6 @@ RUN mvn package -DskipTests
 
 FROM openjdk:11-jdk-slim
 
-COPY --from=build /opt/target/token-*.jar /opt/app.jar
+COPY --from=build /opt/target/counterparty-*.jar /opt/app.jar
 
 CMD java -jar /opt/app.jar --spring.profiles.active=prod
