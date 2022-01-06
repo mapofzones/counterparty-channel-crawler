@@ -34,12 +34,20 @@ public class IbcChannelClient {
 
 			try {
 				ResponseEntity<String> response = denomTraceRestTemplate.getForEntity(uri, String.class);
+
+				if (channelsIsEmptyOrNull(response.getBody()))
+					return "";
+
 				return response.getStatusCode().is5xxServerError() || response.getStatusCode().is4xxClientError() ? "" : uri.toString();
 			} catch (RestClientException e) {
 				try {
 					log.warn("Request cant be completed. " + uri + " Try v1beta...");
 					uri = URI.create(address + endpointProperties.getIbc().getChannelsBeta());
 					ResponseEntity<String> response = denomTraceRestTemplate.exchange(uri, HttpMethod.GET, null, String.class);
+
+					if (channelsIsEmptyOrNull(response.getBody()))
+						return "";
+
 					return response.getStatusCode().is5xxServerError() || response.getStatusCode().is4xxClientError() ? "" : uri.toString();
 				} catch (RestClientException e1) {
 					log.warn("Request cant be completed. " + uri);
@@ -65,7 +73,12 @@ public class IbcChannelClient {
 			return new ChannelsDto(false);
 		}
 	}
-	
+
+	private boolean channelsIsEmptyOrNull(String json) {
+		ChannelsDto dto = jsonToDto(json);
+		return dto.getChannels() == null || dto.getChannels().isEmpty();
+	}
+
 	private ChannelsDto jsonToDto(String json) {
 		try {
 			return denomTraceObjectMapper.readValue(json, ChannelsDto.class);
