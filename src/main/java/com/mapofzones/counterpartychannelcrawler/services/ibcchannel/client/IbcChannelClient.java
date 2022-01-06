@@ -6,6 +6,7 @@ import com.mapofzones.counterpartychannelcrawler.common.exceptons.JsonParseExcep
 import com.mapofzones.counterpartychannelcrawler.common.properties.EndpointProperties;
 import com.mapofzones.counterpartychannelcrawler.services.ibcchannel.client.dto.ChannelsDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -27,38 +28,42 @@ public class IbcChannelClient {
 		this.denomTraceObjectMapper = denomTraceObjectMapper;
 	}
 
-	public boolean check(String address) {
+	public String check(String address) {
 		if (!address.isEmpty()) {
 			URI uri = URI.create(address + endpointProperties.getIbc().getChannels());
 
 			try {
 				ResponseEntity<String> response = denomTraceRestTemplate.getForEntity(uri, String.class);
-				return !response.getStatusCode().is4xxClientError() || !response.getStatusCode().is5xxServerError();
+				return response.getStatusCode().is5xxServerError() || response.getStatusCode().is4xxClientError() ? "" : uri.toString();
 			} catch (RestClientException e) {
-				log.warn("Request cant be completed. " + uri);
-				return false;
+				try {
+					log.warn("Request cant be completed. " + uri + " Try v1beta...");
+					uri = URI.create(address + endpointProperties.getIbc().getChannelsBeta());
+					ResponseEntity<String> response = denomTraceRestTemplate.exchange(uri, HttpMethod.GET, null, String.class);
+					return response.getStatusCode().is5xxServerError() || response.getStatusCode().is4xxClientError() ? "" : uri.toString();
+				} catch (RestClientException e1) {
+					log.warn("Request cant be completed. " + uri);
+					return "";
+				}
 			}
-		} else return false;
+		} else return "";
 	}
 
 	// TODO: Need to refactoring when findRest wos implemented
 	public ChannelsDto findChannels(String address) {
 
-		if (!address.isEmpty()) {
-			URI uri = URI.create(address + endpointProperties.getIbc().getChannels());
-			log.info(String.valueOf((uri)));
+		URI uri = URI.create(address);
+		log.info(String.valueOf((uri)));
 
-			try {
-				ResponseEntity<String> response = denomTraceRestTemplate.getForEntity(uri, String.class);
-				ChannelsDto receivedChannelsDto = jsonToDto(response.getBody());
-				receivedChannelsDto.setSuccessReceived(true);
-				return receivedChannelsDto;
-			} catch (RestClientException e) {
-				log.warn("Request cant be completed. " + uri);
-				return new ChannelsDto(false);
-			}
+		try {
+			ResponseEntity<String> response = denomTraceRestTemplate.getForEntity(uri, String.class);
+			ChannelsDto receivedChannelsDto = jsonToDto(response.getBody());
+			receivedChannelsDto.setSuccessReceived(true);
+			return receivedChannelsDto;
+		} catch (RestClientException e) {
+			log.warn("Request cant be completed. " + uri);
+			return new ChannelsDto(false);
 		}
-		return new ChannelsDto();
 	}
 	
 	private ChannelsDto jsonToDto(String json) {

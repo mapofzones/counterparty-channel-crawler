@@ -15,6 +15,7 @@ public class EndpointProperties {
     @Setter
     public static class IBC {
         private String denomTrace;
+        private String channelsBeta;
         private String channels;
     }
 }
