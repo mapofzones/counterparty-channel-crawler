@@ -3,6 +3,7 @@ package com.mapofzones.counterpartychannelcrawler.services.ibcchannel;
 import com.mapofzones.counterpartychannelcrawler.domain.IbcChannel;
 import com.mapofzones.counterpartychannelcrawler.domain.ZoneNode;
 import com.mapofzones.counterpartychannelcrawler.services.ibcchannel.client.IbcChannelClient;
+import com.mapofzones.counterpartychannelcrawler.services.ibcchannel.client.dto.ChannelCounterpartyDto;
 import com.mapofzones.counterpartychannelcrawler.services.ibcchannel.client.dto.ChannelsDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,11 +39,13 @@ public class IbcChanelService implements IIbcChanelService {
             if (zoneNodeList != null) {
 
                 String workedUrl = "";
+                String workedLcd = "";
                 ZoneNode workedZoneNode = new ZoneNode();
                 for (ZoneNode zoneNode : zoneNodeList) {
                     String url = ibcChannelClient.check(zoneNode.getLcdAddress());
                     if (!url.isEmpty()) {
                         workedUrl = url;
+                        workedLcd = zoneNode.getLcdAddress();
                         workedZoneNode = zoneNode;
                         break;
                     }
@@ -60,8 +63,16 @@ public class IbcChanelService implements IIbcChanelService {
                     if (ch.getIbcChannelId().getChannelId().equals(dto.getChannelId()) && !dto.getCounterparty().getChannelId().isBlank()) {
                         ch.setCounterpartyChannelId(dto.getCounterparty().getChannelId());
                     } else if (dto.getCounterparty().getChannelId().isBlank())
-                        log.info(finalWorkedZoneNode.getZone() + " has empty counterparty channel (channel_id:" + dto.getChannelId() + "). " + "Trying set...");
+                        log.info(finalWorkedZoneNode.getZone() + " has empty counterparty channel (channel_id:" + dto.getChannelId() + ").");
                 }));
+
+                String finalWorkedLcd = workedLcd;
+                value.stream().filter(v -> v.getCounterpartyChannelId() == null).forEach(v -> {
+                    ChannelCounterpartyDto counterpartyDto = ibcChannelClient.findCounterpartyByChannel(finalWorkedLcd, v.getIbcChannelId().getChannelId());
+                    if (counterpartyDto.isSuccessReceived() && !counterpartyDto.getChannel().getCounterparty().getChannelId().isBlank()) {
+                        v.setCounterpartyChannelId(counterpartyDto.getChannel().getCounterparty().getChannelId());
+                    }
+                });
                 log.info("Finish set counterparty in: " + workedZoneNode.getZone());
             }
         });

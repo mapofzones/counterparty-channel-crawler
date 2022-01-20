@@ -17,5 +17,6 @@ public class EndpointProperties {
         private String denomTrace;
         private String channelsBeta;
         private String channels;
+        private String channelsByNum;
     }
 }

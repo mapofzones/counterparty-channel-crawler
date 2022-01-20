@@ -3,9 +3,9 @@ crawler:
 
 endpoint:
   ibc:
-    denom-trace: '/ibc/applications/transfer/v1beta1/denom_traces/%s'
     channels-beta: '/ibc/core/channel/v1beta1/channels'
     channels: '/ibc/core/channel/v1/channels'
+    channels-by-num: '/ibc/core/channel/v1/channels/%s/ports/transfer'
 
 spring:
   main:
