@@ -1,3 +1,6 @@
+crawler:
+  sync-time: ${CR_SYNC_TIME}
+
 spring:
   datasource:
     url: ${DB_URL}

@@ -8,8 +8,10 @@ import com.mapofzones.counterpartychannelcrawler.services.ibcchannel.client.dto.
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,12 +61,17 @@ public class IbcChanelService implements IIbcChanelService {
 
                 log.info("Start set counterparty in: " + workedZoneNode.getZone());
                 ZoneNode finalWorkedZoneNode = workedZoneNode;
+                Set<String> emptyCounterpartyLog = new HashSet<>();
                 value.forEach(ch -> dtoList.forEach(dto -> {
                     if (ch.getIbcChannelId().getChannelId().equals(dto.getChannelId()) && !dto.getCounterparty().getChannelId().isBlank()) {
                         ch.setCounterpartyChannelId(dto.getCounterparty().getChannelId());
                     } else if (dto.getCounterparty().getChannelId().isBlank())
-                        log.info(finalWorkedZoneNode.getZone() + " has empty counterparty channel (channel_id:" + dto.getChannelId() + ").");
+                        emptyCounterpartyLog.add(finalWorkedZoneNode.getZone() + " has empty counterparty channel (channel_id:" + dto.getChannelId() + ").");
+
                 }));
+
+                emptyCounterpartyLog.forEach(log::warn);
+                emptyCounterpartyLog.clear();
 
                 String finalWorkedLcd = workedLcd;
                 value.stream().filter(v -> v.getCounterpartyChannelId() == null).forEach(v -> {

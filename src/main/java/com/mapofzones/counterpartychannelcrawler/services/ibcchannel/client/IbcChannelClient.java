@@ -64,6 +64,17 @@ public class IbcChannelClient {
 	public ChannelCounterpartyDto findCounterpartyByChannel(String address, String channel) {
 		URI uri = URI.create(String.format(address + endpointProperties.getIbc().getChannelsByNum(), channel));
 
+		ChannelCounterpartyDto dto = findCounterpartyByChannel(uri);
+
+		if (!dto.isSuccessReceived()) {
+			URI uriBeta = URI.create(String.format(address + endpointProperties.getIbc().getChannelsByNumBeta(), channel));
+			dto = findCounterpartyByChannel(uriBeta);
+		}
+		return dto;
+
+	}
+
+	public ChannelCounterpartyDto findCounterpartyByChannel(URI uri) {
 		try {
 			ChannelCounterpartyDto receivedDto = denomTraceRestTemplate.getForEntity(uri, ChannelCounterpartyDto.class).getBody();
 			if (receivedDto != null) {
@@ -74,7 +85,6 @@ public class IbcChannelClient {
 			log.warn("Request cant be completed. " + uri);
 			return new ChannelCounterpartyDto(false);
 		}
-
 	}
 
 	private String checkUrl(URI uri) {

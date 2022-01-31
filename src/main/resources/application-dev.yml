@@ -1,3 +1,6 @@
+crawler:
+  sync-time: 30s
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/moz_db

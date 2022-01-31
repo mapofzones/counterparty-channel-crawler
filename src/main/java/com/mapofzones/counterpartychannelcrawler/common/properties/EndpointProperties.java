@@ -18,5 +18,6 @@ public class EndpointProperties {
         private String channelsBeta;
         private String channels;
         private String channelsByNum;
+        private String channelsByNumBeta;
     }
 }

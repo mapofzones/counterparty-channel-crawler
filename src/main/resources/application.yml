@@ -1,11 +1,9 @@
-crawler:
-  sync-time: ${CR_SYNC_TIME}
-
 endpoint:
   ibc:
     channels-beta: '/ibc/core/channel/v1beta1/channels'
     channels: '/ibc/core/channel/v1/channels'
     channels-by-num: '/ibc/core/channel/v1/channels/%s/ports/transfer'
+    channels-by-num-beta: '/ibc/core/channel/v1beta1/channels/%s/ports/transfer'
 
 spring:
   main:
