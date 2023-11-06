@@ -32,6 +32,8 @@ public class CrawlerFacade {
 
         Map<String, List<ZoneNode>> sortedLcdAddressMap = lcdAddressMap();
 
+        sortedLcdAddressMap.entrySet().removeIf(entry -> entry.getValue().size() == 0);
+
         ibcChanelService.findByAddressList(sortedLcdAddressMap);
         log.info("Finish crawler");
     }
