@@ -29,6 +29,17 @@ public class CrawlerFacade {
     @Transactional
     public void findCounterpartyChannel() {
         log.info("Start crawler");
+
+        Map<String, List<ZoneNode>> sortedLcdAddressMap = lcdAddressMap();
+
+        ibcChanelService.findByAddressList(sortedLcdAddressMap);
+        log.info("Finish crawler");
+    }
+
+    /*
+     * Get list of the zone nodes with LCD addresses sorted by zone name
+     */
+    private Map<String, List<ZoneNode>> lcdAddressMap() {
         List<ZoneNode> zoneNodeList = zoneNodeService.findLcdAddresses();
 
         Map<String, List<ZoneNode>> lcdAddressMap = zoneNodeList.stream()
@@ -39,8 +50,7 @@ public class CrawlerFacade {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (e1, e2) -> e1, LinkedHashMap::new));
 
-        ibcChanelService.findByAddressList(sortedLcdAddressMap);
-        log.info("Finish crawler");
+        return sortedLcdAddressMap;
     }
 
 }
