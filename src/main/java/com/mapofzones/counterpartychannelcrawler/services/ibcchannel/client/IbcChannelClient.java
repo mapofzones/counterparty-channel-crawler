@@ -50,7 +50,7 @@ public class IbcChannelClient {
 
 	public ArrayList<ChannelsDto.Channel> findChannels(String address, String pagination, ArrayList<Channel> channels) {
 
-		URI uri = URI.create(address + pagination);
+		URI uri = URI.create(address.trim() + pagination);
 		log.info(String.valueOf((uri)));
 
 		try {
@@ -65,7 +65,7 @@ public class IbcChannelClient {
 				return channels;
 			}
 
-			return findChannels(address, "?pagination.key=" + paginationKey, channels);
+			return findChannels(address, ("?pagination.key=" + paginationKey).trim(), channels);
 		} catch (RestClientException e) {
 			log.warn("Request cant be completed. " + uri);
 			return null;
