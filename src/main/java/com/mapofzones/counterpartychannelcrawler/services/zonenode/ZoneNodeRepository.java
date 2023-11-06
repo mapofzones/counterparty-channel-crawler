@@ -12,5 +12,6 @@ public interface ZoneNodeRepository extends JpaRepository<ZoneNode, String> {
 
 	Optional<ZoneNode> findFirstByZoneAndIsLcdAddressActiveIsTrue(String zone);
 	List<ZoneNode> findAllByLcdAddressIsNotNull();
+	List<ZoneNode> findAllByLcdAddressIsNotNullAndIsLcdAddressActiveIsTrue();
 	
 }

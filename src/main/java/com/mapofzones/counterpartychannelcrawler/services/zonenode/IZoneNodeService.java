@@ -7,4 +7,5 @@ import java.util.List;
 public interface IZoneNodeService {
 
 	List<ZoneNode> findLcdAddresses();
+	List<ZoneNode> findActiveLcdAddresses();
 }

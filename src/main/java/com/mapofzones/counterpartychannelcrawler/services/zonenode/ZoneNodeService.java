@@ -20,4 +20,9 @@ public class ZoneNodeService implements IZoneNodeService {
 	public List<ZoneNode> findLcdAddresses() {
 		return zoneNodeRepository.findAllByLcdAddressIsNotNull();
 	}
+
+	@Override
+	public List<ZoneNode> findActiveLcdAddresses() {
+		return zoneNodeRepository.findAllByLcdAddressIsNotNullAndIsLcdAddressActiveIsTrue();
+	}
 }

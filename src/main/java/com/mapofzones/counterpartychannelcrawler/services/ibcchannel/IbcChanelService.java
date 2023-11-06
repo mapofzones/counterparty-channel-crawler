@@ -36,8 +36,11 @@ public class IbcChanelService implements IIbcChanelService {
                 .collect(Collectors.groupingBy(IbcChannel::getZone));
 
         ibcChannelMap.forEach((key, value) -> {
-
             List<ZoneNode> zoneNodeList = lcdAddressMap.get(key);
+
+            if (zoneNodeList == null)
+                return;
+
             String workedUrl = "";
             String workedLcd = "";
             ZoneNode workedZoneNode = new ZoneNode();
@@ -50,6 +53,9 @@ public class IbcChanelService implements IIbcChanelService {
                     break;
                 }
             }
+
+            // print workedZoneNode
+            System.out.println("WorkedZone:" + workedZoneNode.getLcdAddress());
 
             List<ChannelsDto> dtoList;
             if (!workedUrl.isEmpty())

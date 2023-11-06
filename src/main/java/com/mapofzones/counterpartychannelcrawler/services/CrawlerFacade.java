@@ -42,7 +42,7 @@ public class CrawlerFacade {
      * Get list of the zone nodes with LCD addresses sorted by zone name
      */
     private Map<String, List<ZoneNode>> lcdAddressMap() {
-        List<ZoneNode> zoneNodeList = zoneNodeService.findLcdAddresses();
+        List<ZoneNode> zoneNodeList = zoneNodeService.findActiveLcdAddresses();
 
         Map<String, List<ZoneNode>> lcdAddressMap = zoneNodeList.stream()
                 .collect(Collectors.groupingBy(ZoneNode::getZone));
