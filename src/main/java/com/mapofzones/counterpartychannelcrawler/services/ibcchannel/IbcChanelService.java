@@ -8,6 +8,7 @@ import com.mapofzones.counterpartychannelcrawler.services.ibcchannel.client.dto.
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,16 +55,18 @@ public class IbcChanelService implements IIbcChanelService {
                 }
             }
 
-            // print workedZoneNode
-            System.out.println("WorkedZone:" + workedZoneNode.getLcdAddress());
-
-            List<ChannelsDto> dtoList;
-            if (!workedUrl.isEmpty())
-                dtoList = ibcChannelClient.findChannels(workedUrl).getChannels();
-            else
+            if(workedUrl.isEmpty()) {
                 return;
+            }
+
+            ArrayList<ChannelsDto.Channel> dtoList = ibcChannelClient.findChannels(workedUrl, "", new ArrayList<ChannelsDto.Channel>());
+
+            if(dtoList == null || dtoList.isEmpty()) {
+                return;
+            }
 
             log.info("Start set counterparty in: " + workedZoneNode.getZone());
+
             ZoneNode finalWorkedZoneNode = workedZoneNode;
             Set<String> emptyCounterpartyLog = new HashSet<>();
             value.forEach(ch -> dtoList.forEach(dto -> {

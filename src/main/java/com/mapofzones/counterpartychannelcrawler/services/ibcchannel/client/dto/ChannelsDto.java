@@ -1,15 +1,9 @@
 package com.mapofzones.counterpartychannelcrawler.services.ibcchannel.client.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.*;
+import lombok.*;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @Getter
 @Setter
@@ -18,30 +12,42 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChannelsDto {
 
-	public ChannelsDto(boolean isSuccessReceived) {
-		this.isSuccessReceived = isSuccessReceived;
-	}
+    private ArrayList<Channel> channels;
+    private Pagination pagination;
 
-	private List<ChannelsDto> channels;
-
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@EqualsAndHashCode
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @EqualsAndHashCode
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	@JsonRootName("counterparty")
-	public static class Counterparty {
+    public static class Channel {
+        private Counterparty counterparty;
 		@JsonProperty("channel_id")
-		private String channelId;
-	}
+        private String channelId;
+    }
 
-	@JsonProperty("counterparty")
-	private Counterparty counterparty;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @EqualsAndHashCode
+	@JsonRootName("counterparty")
+    public static class Counterparty {
+        private String port_id;
+		@JsonProperty("channel_id")
+        private String channelId;
+    }
 
-	@JsonProperty("channel_id")
-	private String channelId;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @EqualsAndHashCode
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	@JsonRootName("pagination")
+    public static class Pagination {
+		@JsonProperty("next_key")
+        private String nextKey;
+    }
 
-	@JsonIgnore
-	private boolean isSuccessReceived;
-
+    @JsonIgnore
+    private boolean isSuccessReceived;
 }

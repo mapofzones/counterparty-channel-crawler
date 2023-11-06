@@ -6,12 +6,15 @@ import com.mapofzones.counterpartychannelcrawler.common.exceptons.JsonParseExcep
 import com.mapofzones.counterpartychannelcrawler.common.properties.EndpointProperties;
 import com.mapofzones.counterpartychannelcrawler.services.ibcchannel.client.dto.ChannelCounterpartyDto;
 import com.mapofzones.counterpartychannelcrawler.services.ibcchannel.client.dto.ChannelsDto;
+import com.mapofzones.counterpartychannelcrawler.services.ibcchannel.client.dto.ChannelsDto.Channel;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.ArrayList;
 
 @Slf4j
 public class IbcChannelClient {
@@ -45,19 +48,27 @@ public class IbcChannelClient {
 		} else return EMPTY_STRING;
 	}
 
-	public ChannelsDto findChannels(String address) {
+	public ArrayList<ChannelsDto.Channel> findChannels(String address, String pagination, ArrayList<Channel> channels) {
 
-		URI uri = URI.create(address);
+		URI uri = URI.create(address + pagination);
 		log.info(String.valueOf((uri)));
 
 		try {
 			ResponseEntity<String> response = denomTraceRestTemplate.getForEntity(uri, String.class);
 			ChannelsDto receivedChannelsDto = jsonToDto(response.getBody());
-			receivedChannelsDto.setSuccessReceived(true);
-			return receivedChannelsDto;
+
+			channels.addAll(receivedChannelsDto.getChannels());
+
+			String paginationKey = receivedChannelsDto.getPagination().getNextKey();
+
+			if(paginationKey == null || paginationKey.isEmpty() || paginationKey.equals("null")) {
+				return channels;
+			}
+
+			return findChannels(address, "?pagination.key=" + paginationKey, channels);
 		} catch (RestClientException e) {
 			log.warn("Request cant be completed. " + uri);
-			return new ChannelsDto(false);
+			return null;
 		}
 	}
 
