@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,7 +34,12 @@ public class CrawlerFacade {
         Map<String, List<ZoneNode>> lcdAddressMap = zoneNodeList.stream()
                 .collect(Collectors.groupingBy(ZoneNode::getZone));
 
-        ibcChanelService.findByAddressList(lcdAddressMap);
+        Map<String, List<ZoneNode>> sortedLcdAddressMap = lcdAddressMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(Comparator.comparing(String::toLowerCase)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (e1, e2) -> e1, LinkedHashMap::new));
+
+        ibcChanelService.findByAddressList(sortedLcdAddressMap);
         log.info("Finish crawler");
     }
 
